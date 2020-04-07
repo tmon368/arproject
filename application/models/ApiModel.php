@@ -30,44 +30,64 @@ class ApiModel extends CI_Model {
     
     public function get_pro_of_area($tour_lat,$tour_long)
     {
-        $this->db->select('INFO_LAT,INFO_LONG')->from('Informations');
+        $query = $this->db->query("SELECT * FROM Informations;");
+
+        //$this->db->select('INFO_LAT,INFO_LONG')->from('Informations');
+    
         $area_info = array();
-        $area = $this->db->get();
-        $area ->result_array();
-        if($area_info->num_rows()== 0)
+        if($area_info== null)
         {
-            if($area->num_rows()>0)
+            if($query->num_rows()>0)
             {
-                foreach($area as $row)
+                
+                foreach($query->result_array() as $row)
                 {
                     $info_long = $row['INFO_LONG'];
                     $info_lat = $row['INFO_LAT'];
+                   
                     $theta = $tour_long-$info_long;
                     $dist = sin(deg2rad($tour_lat))*sin(deg2rad($info_lat))+cos(deg2rad($tour_lat))*cos(deg2rad($info_lat))*cos(deg2rad($theta));
                     $dist = acos($dist);
                     $dist = rad2deg($dist);
-                    $miles = $dist*60*1.1515;
-                    $kilometers = $miles*1.609344;
+                    $miles = $dist*60*1.1515; //miles
+                    $kilometers = $miles*1.609344; //kilometers
 
-                    if($kilometers <.050)
+                    if($kilometers <.200)
                     {
-                    // return $area_info= $row;
-                        return $row->result_array();
+                        
+                        return $area_info =  $this->Generate_Promotion_area($row['INFO_LAT'],$row['INFO_LONG']);
+                        //return $area_info= $row;
+                       // return $row->result_array();
                     }
                     
                 }
             }
             else
             {
-                return $area_info=null;
+                 $area_info=null;
             }
         }else{
-            return $area_info->result_array();
+            return $area_info;
         }
 
        // return $area_info->result_array();
     }
 
+    public function Generate_Promotion_area($lat,$long)
+    {
+        $radius= $this->rand_float(0.0,0.1);//in miles
+        $newradius = $radius*1.609344;//in kilometers
+        $newlong = number_format( $long-$newradius/abs(cos(deg2rad($lat))*69),6);
+        $newlat = number_format($lat+($newradius/69),6);
+        return [$newlat,$newlong];
+        //echo $newlat.','.$newlong;
+
+    }
+    function rand_float($st_num=0,$end_num=1,$mul=1000000)
+    {
+    if ($st_num>$end_num) return false;
+    return mt_rand($st_num*$mul,$end_num*$mul)/$mul;
+    }
     public function get_info_all()
     {
         $query = $this->db->get('Informations');
@@ -114,6 +134,18 @@ class ApiModel extends CI_Model {
         $this->db->select('TOURIS_ID,TOURIS_NAME,TOURIS_TYPE,TOURIS_ACTIVE_FLAG')->from('Tourists')->where('TOURIS_EMAIL',$email);
         $query = $this->db->get();
         return $query->result_array();
+    }
+
+    public function CheckIn($touris_id,$info_id,$promotion )
+    {
+       $data_checkin =[
+           'TOURIS_ID'=>$touris_id,
+           'INFO_ID'=>$info_id
+       ];
+       $data_get_promotion=[
+        'TOURIS_ID'=>$touris_id,
+        'PRO_ID'=>$promotion
+       ];
     }
     
     

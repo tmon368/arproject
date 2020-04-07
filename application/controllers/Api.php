@@ -26,7 +26,7 @@ class Api extends CI_Controller {
 		$this->load->model('ApiModel');
 		$lat = $this->input->get('lat');
 		$long = $this->input->get('long');
-		echo $lat,$long;
+	
 		$data = $this->ApiModel->get_pro_of_area($lat,$long);
 		echo json_encode($data,JSON_UNESCAPED_UNICODE);
 	}
