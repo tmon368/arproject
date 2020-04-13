@@ -52,7 +52,7 @@ class ApiModel extends CI_Model {
                     $miles = $dist*60*1.1515; //miles
                     $kilometers = $miles*1.609344; //kilometers
 
-                    if($kilometers <.200)
+                    if($kilometers <0.200)
                     {
                         
                         return $area_info =  $this->Generate_Promotion_area($row['INFO_LAT'],$row['INFO_LONG']);
@@ -85,9 +85,11 @@ class ApiModel extends CI_Model {
     }
     function rand_float($st_num=0,$end_num=1,$mul=1000000)
     {
-    if ($st_num>$end_num) return false;
-    return mt_rand($st_num*$mul,$end_num*$mul)/$mul;
+        if ($st_num>$end_num) return false;
+            return mt_rand($st_num*$mul,$end_num*$mul)/$mul;
     }
+
+
     public function get_info_all()
     {
         $query = $this->db->get('Informations');
@@ -138,13 +140,16 @@ class ApiModel extends CI_Model {
 
     public function CheckIn($touris_id,$info_id,$promotion )
     {
+        $now = date('Y-m-d H:i:s');
        $data_checkin =[
            'TOURIS_ID'=>$touris_id,
            'INFO_ID'=>$info_id
        ];
        $data_get_promotion=[
         'TOURIS_ID'=>$touris_id,
-        'PRO_ID'=>$promotion
+        'PRO_ID'=>$promotion,
+        'USED_DATE'=>null,
+        'REG_DATE'=>$now
        ];
     }
     
