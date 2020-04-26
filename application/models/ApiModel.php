@@ -55,7 +55,8 @@ class ApiModel extends CI_Model {
                     if($kilometers <0.200)
                     {
                         
-                        return $area_info =  $this->Generate_Promotion_area($row['INFO_LAT'],$row['INFO_LONG']);
+                        $area_info = array('Location' =>  $this->Generate_Promotion_area($row['INFO_LAT'],$row['INFO_LONG']));
+                        return $area_info;
                         //return $area_info= $row;
                        // return $row->result_array();
                     }
